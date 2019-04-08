@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pre.chl.mypetstore.persistence.AccountMapper">
+
+    <resultMap id="account_result" type="pre.chl.mypetstore.domain.Account">
+        <id property="aid" column="aid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="lastpasswordresetdate" column="lastpwdresetdate"/>
+        <result property="aexist" column="aexist"/>
+        <result property="loginTime" column="login_time"/>
+        <result property="state" column="state"/>
+        <collection property="authorities" ofType="pre.chl.mypetstore.domain.Authority">
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+        </collection>
+    </resultMap>
+    <select id="getAccountByUsernameAndPassword"  resultMap="account_result">
+    SELECT
+      ACCOUNT.AID,
+      ACCOUNT.USERNAME,
+      ACCOUNT.PASSWORD,
+      ACCOUNT.EMAIL,
+      ACCOUNT.LASTPWDRESETDATE,
+      ACCOUNT.AEXIST,
+      ACCOUNT.LOGIN_TIME,
+      ACCOUNT.STATE,
+      AUTHORITY.ID,
+      AUTHORITY.NAME
+    FROM ACCOUNT,AUTHORITY
+    WHERE ACCOUNT.USERNAME = #{username}
+      AND ACCOUNT.PASSWORD = #{password}
+      AND ACCOUNT.AID = AUTHORITY.ID
+      AND ACCOUNT.AEXIST = 1
+  </select>
+
+    <select id="getAccountByUsername" parameterType="java.lang.String" resultMap="account_result">
+    SELECT
+      ACCOUNT.AID,
+      ACCOUNT.USERNAME,
+      ACCOUNT.PASSWORD,
+      ACCOUNT.EMAIL,
+      ACCOUNT.LASTPWDRESETDATE,
+      ACCOUNT.AEXIST,
+      ACCOUNT.LOGIN_TIME,
+      ACCOUNT.STATE,
+      AUTHORITY.ID,
+      AUTHORITY.NAME
+    FROM ACCOUNT,AUTHORITY
+    WHERE ACCOUNT.USERNAME = #{username}
+      AND ACCOUNT.AID = AUTHORITY.ID
+      AND ACCOUNT.AEXIST = 1
+  </select>
+
+    <update id="updateAccount" parameterType="pre.chl.mypetstore.domain.Account">
+    UPDATE ACCOUNT SET
+      EMAIL = #{email},
+      FIRSTNAME = #{firstName},
+      LASTNAME = #{lastName},
+      STATUS = #{status},
+      ADDR1 = #{address1},
+      ADDR2 = #{address2,jdbcType=VARCHAR},
+      CITY = #{city},
+      STATE = #{state},
+      ZIP = #{zip},
+      COUNTRY = #{country},
+      PHONE = #{phone}
+    WHERE USERID = #{username}
+  </update>
+
+    <insert id="insertAccount" parameterType="pre.chl.mypetstore.domain.Account">
+    INSERT INTO ACCOUNT
+      (EMAIL, FIRSTNAME, LASTNAME, STATUS, ADDR1, ADDR2, CITY, STATE, ZIP, COUNTRY, PHONE, USERID)
+    VALUES
+      (#{email}, #{firstName}, #{lastName}, #{status}, #{address1},  #{address2,jdbcType=VARCHAR}, #{city}, #{state}, #{zip}, #{country}, #{phone}, #{username})
+  </insert>
+
+    <!--
+    TODO MyBatis 3 does not map booleans to integers
+    <update id="updateProfile" parameterType="account">
+      UPDATE PROFILE SET
+        LANGPREF = #{languagePreference},
+        FAVCATEGORY = #{favouriteCategoryId},
+        MYLISTOPT = #{listOption},
+        BANNEROPT = #{bannerOption}
+      WHERE USERID = #{username}
+    </update>
+    -->
+
+    <update id="updateProfile" parameterType="pre.chl.mypetstore.domain.Account">
+    UPDATE PROFILE SET
+      LANGPREF = #{languagePreference},
+      FAVCATEGORY = #{favouriteCategoryId},
+      BANNEROPT = #{bannerOption}
+    WHERE USERID = #{username}
+  </update>
+
+    <!--
+    TODO MyBatis 3 does not map booleans to integers
+    <insert id="insertProfile" parameterType="account">
+      INSERT INTO PROFILE (LANGPREF, FAVCATEGORY, MYLISTOPT, BANNEROPT, USERID)
+      VALUES (#{languagePreference}, #{favouriteCategoryId}, #{listOption}, #{bannerOption}, #{username})
+    </insert>
+    -->
+
+    <insert id="insertProfile" parameterType="pre.chl.mypetstore.domain.Account">
+    INSERT INTO PROFILE (LANGPREF, FAVCATEGORY, USERID,BANNEROPT)
+    VALUES (#{languagePreference}, #{favouriteCategoryId}, #{username},#{bannerOption})
+  </insert>
+
+    <update id="updateSignon" parameterType="pre.chl.mypetstore.domain.Account">
+    UPDATE SIGNON SET PASSWORD = #{password}
+    WHERE USERNAME = #{username}
+  </update>
+
+    <insert id="insertSignon" parameterType="pre.chl.mypetstore.domain.Account">
+    INSERT INTO SIGNON (PASSWORD,USERNAME)
+    VALUES (#{password}, #{username})
+  </insert>
+
+</mapper>
